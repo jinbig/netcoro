@@ -12,8 +12,10 @@
     <ClInclude Include="Client.h" />
     <ClInclude Include="Server.h" />
     <ClInclude Include="Serializer.h" />
+    <ClInclude Include="TokenHandler.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
+    <ClCompile Include="TokenHandler.cpp" />
   </ItemGroup>
 </Project>

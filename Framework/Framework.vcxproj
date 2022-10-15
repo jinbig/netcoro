@@ -167,6 +167,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AsyncTaskProcessor.h" />
     <ClInclude Include="Connection.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="IoContext.h" />
@@ -177,6 +178,7 @@
     <ClInclude Include="TcpServer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AsyncTaskProcessor.cpp" />
     <ClCompile Include="Framework.cpp" />
     <ClCompile Include="IoContext.cpp" />
     <ClCompile Include="pch.cpp">

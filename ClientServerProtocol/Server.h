@@ -7,28 +7,14 @@
 #include <Framework/Logger.h>
 
 #include "ProtocolData.h"
+#include "TokenHandler.h"
 
 namespace proto {
-
-class TokensHandler
-{
-public:
-	struct ClientInfo
-	{
-		std::string client_id_;
-		std::string address_;
-		unsigned short port_ = 0;
-	};
-
-	virtual void OnTokenReceivedFrom(std::string&& token, ClientInfo&& client_info) = 0;
-};
-
-using TokensHandlerPtr = std::shared_ptr<TokensHandler>;
 
 class Server : public netcoro::IConnectionHandler
 {
 public:
-	Server(TokensHandlerPtr tokens_handler) : tokens_handler_(std::move(tokens_handler)) {}
+	Server(ITokenHandlerPtr tokens_handler) : tokens_handler_(std::move(tokens_handler)) {}
 
 private:
 	struct Session
@@ -141,14 +127,14 @@ private:
 			if (!deserializer.Deserialize(token)) {
 				return false;
 			}
-			TokensHandler::ClientInfo client_info{ std::move(session.greeting_packet_.client_id_) };
+			ITokenHandler::ClientInfo client_info{ std::move(session.greeting_packet_.client_id_) };
 			connection->GetInfo(netcoro::IConnection::EndPointInfoType::kRemote, client_info.address_, client_info.port_);
 			tokens_handler_->OnTokenReceivedFrom(std::move(token), std::move(client_info));
 		}
 		return true;
 	}
 
-	TokensHandlerPtr tokens_handler_;
+	ITokenHandlerPtr tokens_handler_;
 };
 
 }

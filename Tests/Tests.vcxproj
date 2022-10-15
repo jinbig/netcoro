@@ -36,6 +36,7 @@
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AsyncTaskProcessorTest.cpp" />
     <ClCompile Include="ClientServerProtocolTest.cpp" />
     <ClCompile Include="SerializerTest.cpp" />
     <ClCompile Include="TcpClientServerTest.cpp" />
@@ -50,6 +51,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ClientServerProtocol\ClientServerProtocol.vcxproj">
+      <Project>{52b5f278-ce8c-4068-a605-8246754063c6}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Framework\Framework.vcxproj">
       <Project>{0223919f-7b07-40b6-902f-6f682cd6c7eb}</Project>
     </ProjectReference>
