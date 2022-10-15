@@ -2,9 +2,9 @@
 
 #include <mutex>
 
-#include "Logger.h"
-#include "TcpClient.h"
-#include "TcpServer.h"
+#include <Framework/Logger.h>
+#include <Framework/TcpClient.h>
+#include <Framework/TcpServer.h>
 
 const std::string kAddress = "127.0.0.1";
 const unsigned short kPort = 1111;
@@ -19,8 +19,8 @@ public:
 		ServerHandler(ClientServerTest& test) : test_(test) {}
 		void OnNewConnection(netcoro::IConnectionPtr connection) final
 		{
-			netcoro::Buffer buffer(10, 0);
-			bool result = !connection->Read(buffer) && !connection->Write(buffer);
+			netcoro::Buffer buffer(100, 0);
+			bool result = !connection->ReadSome(buffer) && !connection->Write(buffer);
 			if (result) {
 				test_.AddServerResult();
 			}
@@ -33,11 +33,11 @@ public:
 		ClientHandler(ClientServerTest& test) : test_(test) {}
 		void OnNewConnection(netcoro::IConnectionPtr connection) final
 		{
-			netcoro::Buffer buffer(10, 0);
 			bool result = !connection->Connect(kAddress, kPort);
 			if (test_.add_sleep_for_timeot_operation_ms_) {
 				std::this_thread::sleep_for(std::chrono::milliseconds(test_.add_sleep_for_timeot_operation_ms_));
 			}
+			netcoro::Buffer buffer(10, 0);
 			result &= !connection->Write(buffer) && !connection->Read(buffer);
 			if (result) {
 				test_.AddClientResult();

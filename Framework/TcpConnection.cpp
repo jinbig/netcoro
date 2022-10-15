@@ -13,6 +13,17 @@ TcpConnection::TcpConnection(boost::asio::io_context& io_context, boost::asio::i
 {
 }
 
+IConnection::Result TcpConnection::GetInfo(EndPointInfoType type, std::string& address, unsigned short& port)
+{
+	boost::system::error_code ec;
+	auto end_point = (type == EndPointInfoType::kLocal ? socket_.local_endpoint(ec) : socket_.remote_endpoint(ec));
+	if (!ec) {
+		address = end_point.address().to_string();
+		port = end_point.port();
+	}
+	return ec;
+}
+
 IConnection::Result TcpConnection::Connect(const std::string& ip_address, unsigned short port)
 {
 	boost::system::error_code ec;
@@ -28,9 +39,14 @@ IConnection::Result TcpConnection::Connect(const std::string& ip_address, unsign
 
 IConnection::Result TcpConnection::Read(Buffer& buffer)
 {
+	return Read(buffer.data(), buffer.size());
+}
+
+IConnection::Result TcpConnection::Read(unsigned char* buffer, size_t buffer_size)
+{
 	boost::system::error_code ec;
 	OperationTimeoutInScope operation_timeout(*timer_, operation_timeout_ms_);
-	boost::asio::async_read(socket_, boost::asio::buffer(buffer), yield_context_.value()[ec]);
+	boost::asio::async_read(socket_, boost::asio::buffer(buffer, buffer_size), yield_context_.value()[ec]);
 	return ec;
 }
 
@@ -38,15 +54,21 @@ IConnection::Result TcpConnection::ReadSome(Buffer& buffer)
 {
 	boost::system::error_code ec;
 	OperationTimeoutInScope operation_timeout(*timer_, operation_timeout_ms_);
-	socket_.async_read_some(boost::asio::buffer(buffer), yield_context_.value()[ec]);
+	size_t bytes_transferred = socket_.async_read_some(boost::asio::buffer(buffer), yield_context_.value()[ec]);
+	buffer.resize(bytes_transferred);
 	return ec;
 }
 
 IConnection::Result TcpConnection::Write(const Buffer& buffer)
 {
+	return Write(buffer.data(), buffer.size());
+}
+
+IConnection::Result TcpConnection::Write(const unsigned char* buffer, size_t buffer_size)
+{
 	boost::system::error_code ec;
 	OperationTimeoutInScope operation_timeout(*timer_, operation_timeout_ms_);
-	boost::asio::async_write(socket_, boost::asio::buffer(buffer), yield_context_.value()[ec]);
+	boost::asio::async_write(socket_, boost::asio::buffer(buffer, buffer_size), yield_context_.value()[ec]);
 	return ec;
 }
 

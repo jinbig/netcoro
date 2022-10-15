@@ -15,10 +15,13 @@ class TcpConnection : public IConnection
 public:
 	static void Create(boost::asio::io_context& io_context, boost::asio::ip::tcp::socket&& socket, IConnectionHandlerPtr handler, size_t operation_timeout_ms);
 
+	Result GetInfo(EndPointInfoType type, std::string& address, unsigned short& port) final;
 	Result Connect(const std::string& address, unsigned short port) final;
 	Result Read(Buffer& buffer) final;
+	Result Read(unsigned char* buffer, size_t buffer_size) final;
 	Result ReadSome(Buffer& buffer) final;
 	Result Write(const Buffer& buffer) final;
+	Result Write(const unsigned char* buffer, size_t buffer_size) final;
 	Result Close() final;
 
 private:
