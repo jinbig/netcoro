@@ -4,15 +4,15 @@
 
 namespace proto {
 
-const int kMagic = *reinterpret_cast<int*>("tedp");
+const int kMagic = *reinterpret_cast<const int*>("tedp");
 const int kProtocolVersion = 1;
 
-enum PacketType : int
+enum class PacketType : int
 {
-	kPacketTypeNone = 0,
-	kPacketTypeGreeting = 1,
-	kPacketTypeReady = 2,
-	kPacketTypeTokens = 3,
+	kNone = 0,
+	kGreeting = 1,
+	kReady = 2,
+	kTokens = 3,
 };
 
 #pragma pack(push, 1)
@@ -20,7 +20,7 @@ struct PacketHeader
 {
 	int protocol_type_ = kMagic;
 	int protocol_version_ = kProtocolVersion;
-	PacketType packet_type_ = kPacketTypeNone;
+	PacketType packet_type_ = PacketType::kNone;
 	int payload_size_ = 0;
 
 	bool CheckHeader(PacketType expected_packet_type) const
@@ -59,11 +59,11 @@ struct ReadyPacket
 };
 #pragma pack(pop)
 
-std::ostream& operator<<(std::ostream& os, const PacketHeader& header)
+inline std::ostream& operator<<(std::ostream& os, const PacketHeader& header)
 {
 	return os << "ProtocolType: " << header.protocol_type_
 		<< "ProtocolVersion: " << header.protocol_version_
-		<< "PacketType: " << header.packet_type_
+		<< "PacketType: " << (int)header.packet_type_
 		<< "PaoloadSize: " << header.payload_size_;
 }
 

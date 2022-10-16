@@ -17,5 +17,7 @@
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="TokenHandler.cpp" />
+    <ClCompile Include="Server.cpp" />
+    <ClCompile Include="Client.cpp" />
   </ItemGroup>
 </Project>

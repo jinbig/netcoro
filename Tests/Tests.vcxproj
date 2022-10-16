@@ -33,12 +33,16 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
+    <ClInclude Include="ClientServerProtocolMock.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="TcpClientServerMock.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AsyncTaskProcessorTest.cpp" />
     <ClCompile Include="ClientServerProtocolTest.cpp" />
+    <ClCompile Include="ClientServerProtocolMock.cpp" />
     <ClCompile Include="SerializerTest.cpp" />
+    <ClCompile Include="TcpClientServerMock.cpp" />
     <ClCompile Include="TcpClientServerTest.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

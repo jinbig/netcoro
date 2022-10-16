@@ -4,7 +4,7 @@
 
 #include <Framework/AsyncTaskProcessor.h>
 
-class AsyncTask : public netcoro::ITask
+class AsyncTaskMock : public netcoro::ITask
 {
 public:
 	bool CheckResults(int expected_calls, int wait_ms = 1000)
@@ -26,7 +26,7 @@ TEST(AsyncTaskProcessor, AsyncTaskProcessorTest) {
 	const int kThreadPoolSize = 1;
 	netcoro::IoContext io_context(kThreadPoolSize);
 	netcoro::AsyncTaskProcessor async_task_processor(io_context);
-	auto task = std::make_shared<AsyncTask>();
+	auto task = std::make_shared<AsyncTaskMock>();
 	const int kCallsNumber = 5;
 	for (int i = 0; i < kCallsNumber; ++i) {
 		async_task_processor.Post(task);
