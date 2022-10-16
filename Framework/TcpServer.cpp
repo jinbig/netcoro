@@ -53,8 +53,8 @@ void TcpServer::Initialize(IConnectionHandlerPtr handler, short thread_pool_size
 
 TcpServer::~TcpServer()
 {
-	impl_->io_context_.Stop();
 	impl_->acceptor_.close();
+	impl_->io_context_.Stop();
 }
 
 }

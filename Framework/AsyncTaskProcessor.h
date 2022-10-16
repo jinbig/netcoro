@@ -6,7 +6,7 @@
 
 namespace netcoro {
 
-class ITask
+class ITask : public ObjCounter<ITask>
 {
 public:
 	virtual ~ITask() = default;
@@ -15,7 +15,7 @@ public:
 
 using ITaskPtr = std::shared_ptr<ITask>;
 
-class IAsyncTaskProcessor
+class IAsyncTaskProcessor : public ObjCounter<IAsyncTaskProcessor>
 {
 public:
 	virtual ~IAsyncTaskProcessor() = default;

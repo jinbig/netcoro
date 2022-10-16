@@ -6,11 +6,13 @@
 
 #include <boost/system/error_code.hpp>
 
+#include "ObjCounter.h"
+
 namespace netcoro {
 
 using Buffer = std::vector<unsigned char>;
 
-class IConnection
+class IConnection : public ObjCounter<IConnection>
 {
 public:
 	using Result = boost::system::error_code;
@@ -28,7 +30,7 @@ public:
 
 using IConnectionPtr = std::shared_ptr<IConnection>;
 
-class IConnectionHandler
+class IConnectionHandler : public ObjCounter<IConnectionHandler>
 {
 public:
 	virtual ~IConnectionHandler() = default;

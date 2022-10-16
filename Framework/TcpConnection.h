@@ -7,6 +7,7 @@
 #include <boost/thread.hpp>
 
 #include "Connection.h"
+#include "ObjCounter.h"
 
 namespace netcoro {
 

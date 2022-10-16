@@ -4,6 +4,7 @@
 #include <boost/asio/spawn.hpp>
 #include <boost/thread.hpp>
 
+#include "Logger.h"
 #include "IoContext.h"
 
 namespace netcoro {
@@ -39,8 +40,8 @@ IoContextImpl::~IoContextImpl()
 
 void IoContextImpl::Stop()
 {
-	work_guard_.reset();
 	io_context_->stop();
+	work_guard_.reset();
 	threads_.join_all();
 }
 

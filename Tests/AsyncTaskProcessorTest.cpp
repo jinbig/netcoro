@@ -4,6 +4,8 @@
 
 #include <Framework/AsyncTaskProcessor.h>
 
+#include "TcpClientServerMock.h"
+
 class AsyncTaskMock : public netcoro::ITask
 {
 public:
@@ -22,14 +24,19 @@ private:
 	std::atomic<int> call_counter_ = 0;
 };
 
-TEST(AsyncTaskProcessor, AsyncTaskProcessorTest) {
-	const int kThreadPoolSize = 1;
-	netcoro::IoContext io_context(kThreadPoolSize);
-	netcoro::AsyncTaskProcessor async_task_processor(io_context);
-	auto task = std::make_shared<AsyncTaskMock>();
-	const int kCallsNumber = 5;
-	for (int i = 0; i < kCallsNumber; ++i) {
-		async_task_processor.Post(task);
+TEST(AsyncTaskProcessor, AsyncTaskProcessorTest)
+{
+	ASSERT_TRUE(test::ClientServerBase::IsObjCountersNull());
+	{
+		const int kThreadPoolSize = 1;
+		netcoro::IoContext io_context(kThreadPoolSize);
+		netcoro::AsyncTaskProcessor async_task_processor(io_context);
+		auto task = std::make_shared<AsyncTaskMock>();
+		const int kCallsNumber = 5;
+		for (int i = 0; i < kCallsNumber; ++i) {
+			async_task_processor.Post(task);
+		}
+		ASSERT_TRUE(task->CheckResults(kCallsNumber));
 	}
-	ASSERT_TRUE(task->CheckResults(kCallsNumber));
+	ASSERT_TRUE(test::ClientServerBase::IsObjCountersNull());
 }

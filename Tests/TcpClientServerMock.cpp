@@ -1,5 +1,7 @@
 #include "pch.h"
 
+#include <Framework/AsyncTaskProcessor.h>
+
 #include "TcpClientServerMock.h"
 
 namespace test {
@@ -11,6 +13,17 @@ bool ClientServerBase::CheckResults(int result, int wait_ms)
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
 	return false;
+}
+
+bool ClientServerBase::IsObjCountersNull()
+{
+	bool result = netcoro::ObjCounter<netcoro::TcpServer>::IsEmpty();
+	result &= netcoro::ObjCounter<netcoro::IConnection>::IsEmpty();
+	result &= netcoro::ObjCounter<netcoro::IConnectionHandler>::IsEmpty();
+	result &= netcoro::ObjCounter<netcoro::IoContext>::IsEmpty();
+	result &= netcoro::ObjCounter<netcoro::ITask>::IsEmpty();
+	result &= netcoro::ObjCounter<netcoro::IAsyncTaskProcessor>::IsEmpty();
+	return result;
 }
 
 ClientMock::ClientMock(short thread_pool_size)

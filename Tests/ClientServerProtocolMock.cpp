@@ -6,6 +6,10 @@
 
 namespace test {
 
+const std::string kAddress = "127.0.0.1";
+const unsigned short kPort = 11111;
+const size_t kDefaultOperationTimeoutMs = 100000;
+
 TokenHandlerMock::TokenHandlerMock(int procession_sleep_timeout_ms)
 	: procession_sleep_timeout_ms_(procession_sleep_timeout_ms)
 {}

@@ -1,12 +1,14 @@
 #pragma once
 
+#include "ObjCounter.h"
+
 namespace boost::asio { class io_context; }
 
 namespace netcoro {
 	
 class IoContextImpl;
 
-class IoContext
+class IoContext : public ObjCounter<IoContext>
 {
 public:
 	IoContext(short thread_pool_size);

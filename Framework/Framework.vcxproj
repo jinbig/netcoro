@@ -172,6 +172,7 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="IoContext.h" />
     <ClInclude Include="Logger.h" />
+    <ClInclude Include="ObjCounter.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="TcpClient.h" />
     <ClInclude Include="TcpConnection.h" />

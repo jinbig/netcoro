@@ -25,6 +25,7 @@ public:
 	void AddResult() { results_.fetch_add(1, std::memory_order_relaxed); }
 	bool CheckResults(int result, int wait_ms = 1000);
 
+	static bool IsObjCountersNull();
 protected:
 	size_t sleep_for_timeot_operation_ms_ = 0;
 	netcoro::IConnectionHandlerPtr handler_;

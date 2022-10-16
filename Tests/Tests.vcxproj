@@ -41,6 +41,7 @@
     <ClCompile Include="AsyncTaskProcessorTest.cpp" />
     <ClCompile Include="ClientServerProtocolTest.cpp" />
     <ClCompile Include="ClientServerProtocolMock.cpp" />
+    <ClCompile Include="ObjCounetrTest.cpp" />
     <ClCompile Include="SerializerTest.cpp" />
     <ClCompile Include="TcpClientServerMock.cpp" />
     <ClCompile Include="TcpClientServerTest.cpp" />
