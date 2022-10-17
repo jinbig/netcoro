@@ -6,9 +6,9 @@
 namespace netcoro {
 
 TcpConnection::TcpConnection(boost::asio::io_context& io_context, boost::asio::ip::tcp::socket&& socket, size_t operation_timeout_ms)
-	: strand_(io_context.get_executor())
-	, socket_(std::move(socket))
+	: strand_(std::make_shared<boost::asio::strand<boost::asio::io_context::executor_type>>(io_context.get_executor()))
 	, timer_(std::make_shared<boost::asio::steady_timer>(io_context, std::chrono::steady_clock::time_point::max()))
+	, socket_(std::move(socket))
 	, operation_timeout_ms_(operation_timeout_ms)
 {
 }
@@ -82,12 +82,12 @@ IConnection::Result TcpConnection::Close()
 void TcpConnection::Create(boost::asio::io_context& io_context, boost::asio::ip::tcp::socket&& socket, IConnectionHandlerPtr handler, size_t operation_timeout_ms)
 {
 	std::shared_ptr<TcpConnection> connection(new TcpConnection(io_context, std::move(socket), operation_timeout_ms));
-	connection->CheckOperationTimeout(connection, connection->timer_);
-	auto& tmp_connection_ref = *connection;
-	boost::asio::spawn(tmp_connection_ref.strand_, [connection = std::move(connection), handler = std::move(handler)](boost::asio::yield_context yield) mutable {
+	CheckOperationTimeout(connection, connection->timer_, connection->strand_);
+	auto& strand_ref = *connection->strand_;
+	boost::asio::spawn(strand_ref, [connection = std::move(connection), handler = std::move(handler)](boost::asio::yield_context yield) mutable {
 		connection->Initialize(std::move(yield));
 		handler->OnNewConnection(std::move(connection));
-	}, boost::asio::detached);
+	});
 }
 
 void TcpConnection::Initialize(boost::asio::yield_context&& yield)
@@ -95,12 +95,15 @@ void TcpConnection::Initialize(boost::asio::yield_context&& yield)
 	yield_context_.emplace(std::move(yield));
 }
 
-void TcpConnection::CheckOperationTimeout(std::weak_ptr<TcpConnection> self, std::shared_ptr<boost::asio::steady_timer> timer)
+void TcpConnection::CheckOperationTimeout(std::weak_ptr<TcpConnection> self, TimerPtr timer, StrandPtr strand)
 {
-	boost::asio::spawn(strand_, [self = std::move(self), timer = std::move(timer)](boost::asio::yield_context yield) mutable {
-		while (timer->expires_at() > std::chrono::steady_clock::now()) {
-			boost::system::error_code ec;
-			timer->async_wait(yield[ec]);
+	auto& timer_ref = *timer;
+	auto& strand_ref = *strand;
+	timer_ref.async_wait(boost::asio::bind_executor(strand_ref,
+		[self = std::move(self), timer = std::move(timer), strand = std::move(strand)](const boost::system::error_code&) mutable {
+		if(timer->expires_at() > std::chrono::steady_clock::now()) {
+			CheckOperationTimeout(std::move(self), std::move(timer), std::move(strand));
+			return;
 		}
 
 		auto connection = self.lock();
@@ -110,7 +113,7 @@ void TcpConnection::CheckOperationTimeout(std::weak_ptr<TcpConnection> self, std
 		boost::system::error_code ec;
 		connection->socket_.close(ec);
 		timer->cancel(ec);
-	}, boost::asio::detached);
+	}));
 }
 
 TcpConnection::OperationTimeoutInScope::OperationTimeoutInScope(boost::asio::steady_timer& timer, size_t operation_timeout_ms)

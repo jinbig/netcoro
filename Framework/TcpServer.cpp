@@ -41,14 +41,7 @@ void TcpServerImpl::AcceptConnection(std::shared_ptr<TcpServerImpl> server, ICon
 TcpServer::TcpServer(unsigned short port, IConnectionHandlerPtr handler, unsigned short thread_pool_size, size_t operation_timeout_ms)
 	: impl_(std::make_shared<TcpServerImpl>(port, thread_pool_size, operation_timeout_ms))
 {
-	Initialize(std::move(handler), thread_pool_size);
-}
-
-void TcpServer::Initialize(IConnectionHandlerPtr handler, short thread_pool_size)
-{
-	for (short i = 0; i < thread_pool_size; ++i) {
-		impl_->AcceptConnection(impl_, handler);
-	}
+	impl_->AcceptConnection(impl_, handler);
 }
 
 TcpServer::~TcpServer()

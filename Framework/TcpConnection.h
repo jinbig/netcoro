@@ -26,10 +26,13 @@ public:
 	Result Close() final;
 
 private:
+	using StrandPtr = std::shared_ptr<boost::asio::strand<boost::asio::io_context::executor_type>>;
+	using TimerPtr = std::shared_ptr<boost::asio::steady_timer>;
+
 	TcpConnection(boost::asio::io_context& io_context, boost::asio::ip::tcp::socket&& socket, size_t operation_timeout_ms);
 
 	void Initialize(boost::asio::yield_context&& yield);
-	void CheckOperationTimeout(std::weak_ptr<TcpConnection> self, std::shared_ptr<boost::asio::steady_timer> timer);
+	static void CheckOperationTimeout(std::weak_ptr<TcpConnection> self, TimerPtr timer, StrandPtr strand);
 
 	struct OperationTimeoutInScope
 	{
@@ -38,10 +41,11 @@ private:
 		boost::asio::steady_timer& timer_;
 	};
 
-	boost::asio::strand<boost::asio::io_context::executor_type> strand_;
+	StrandPtr strand_;
+	TimerPtr timer_;
+
 	boost::asio::ip::tcp::socket socket_;
 	std::optional<boost::asio::yield_context> yield_context_;
-	std::shared_ptr<boost::asio::steady_timer> timer_;
 
 	const size_t operation_timeout_ms_;
 };

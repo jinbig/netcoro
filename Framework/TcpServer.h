@@ -13,7 +13,6 @@ public:
 	~TcpServer();
 
 private:
-	void Initialize(IConnectionHandlerPtr handler, short thread_pool_size);
 	std::shared_ptr<TcpServerImpl> impl_;
 };
 
