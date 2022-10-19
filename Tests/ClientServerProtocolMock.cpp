@@ -113,4 +113,20 @@ bool TokenHandlerFactoryMock::CheckTokensResults(int tokens_number, int clients_
 	return true;
 }
 
+DumpTokenHandlersInfoToFileTaskMock::DumpTokenHandlersInfoToFileTaskMock(
+	const netcoro::IAsyncTaskProcessorPtr& async_task_processor, std::shared_ptr<TokenHandlerFactoryMock> token_factory,
+	const std::string& file_name, size_t timeout_ms)
+	: async_task_processor_(async_task_processor), token_factory_(std::move(token_factory)), file_name_(file_name), timeout_ms_(timeout_ms)
+{}
+
+void DumpTokenHandlersInfoToFileTaskMock::Process(netcoro::ITaskPtr self_task)
+{
+	token_factory_->DumpInfoToFile(file_name_);
+	auto task_processor = async_task_processor_.lock();
+	if (!task_processor) {
+		return;
+	}
+	task_processor->PostDeferred(std::move(self_task), timeout_ms_);
+}
+
 }

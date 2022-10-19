@@ -50,4 +50,20 @@ private:
 	std::mutex handlers_lock_;
 };
 
+class DumpTokenHandlersInfoToFileTaskMock : public netcoro::ITask
+{
+public:
+	DumpTokenHandlersInfoToFileTaskMock(
+		const netcoro::IAsyncTaskProcessorPtr& async_task_processor,
+		std::shared_ptr<TokenHandlerFactoryMock> token_factory,
+		const std::string& file_name, size_t timeout_ms);
+private:
+	void Process(netcoro::ITaskPtr self_task) final;
+
+	std::weak_ptr<netcoro::IAsyncTaskProcessor> async_task_processor_;
+	std::shared_ptr<TokenHandlerFactoryMock> token_factory_;
+	std::string file_name_;
+	size_t timeout_ms_;
+};
+
 }

@@ -18,7 +18,7 @@ public:
 		return false;
 	}
 private:
-	void Process() final {
+	void Process(netcoro::ITaskPtr) final {
 		call_counter_.fetch_add(1, std::memory_order_relaxed);
 	}
 	std::atomic<int> call_counter_ = 0;
@@ -37,6 +37,11 @@ TEST(AsyncTaskProcessor, AsyncTaskProcessorTest)
 			async_task_processor.Post(task);
 		}
 		ASSERT_TRUE(task->CheckResults(kCallsNumber));
+
+		for (int i = 0; i < kCallsNumber; ++i) {
+			async_task_processor.PostDeferred(task, 1);
+		}
+		ASSERT_TRUE(task->CheckResults(kCallsNumber * 2));
 	}
 	ASSERT_TRUE(test::ClientServerBase::IsObjCountersNull());
 }

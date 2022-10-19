@@ -9,7 +9,7 @@ class AsyncTokenHandlerTask : public netcoro::ITask
 public:
 	AsyncTokenHandlerTask(ITokenHandlerPtr&& token_handler, ITokenHandler::ClientInfo&& client_info, std::string&& token)
 		: token_handler_(std::move(token_handler)), client_info_(std::move(client_info)), token_(std::move(token)) {}
-	void Process() final { token_handler_->OnTokenReceivedFrom(std::move(token_), std::move(client_info_)); }
+	void Process(netcoro::ITaskPtr) final { token_handler_->OnTokenReceivedFrom(std::move(token_), std::move(client_info_)); }
 	ITokenHandlerPtr token_handler_;
 	ITokenHandler::ClientInfo client_info_;
 	std::string token_;

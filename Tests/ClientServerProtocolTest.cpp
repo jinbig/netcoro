@@ -10,20 +10,27 @@ using namespace test;
 TEST(ClientServerProtocol, ClientServerProtocolTest)
 {
 	ASSERT_TRUE(ClientServerBase::IsObjCountersNull());
-	{
-		const int kProcessionSleepTimeoutMs = 10;
-		auto token_handler_factory = std::make_shared<TokenHandlerFactoryMock>(kProcessionSleepTimeoutMs);
 
+	const std::string kTokensFileName("test_tokens.bin");
+	const std::string kDumpFileName("dump.bin");
+
+	{
+		const int kProcessingSleepTimeoutMs = 10;
 		const int kThreadPoolSize = 2;
 		netcoro::IoContext token_handler_io_context(kThreadPoolSize);
 		auto async_task_processor = std::make_shared<netcoro::AsyncTaskProcessor>(token_handler_io_context);
+		auto token_handler_factory = std::make_shared<TokenHandlerFactoryMock>(kProcessingSleepTimeoutMs);
+
+		const int kPeriodicalDumpTimeoutMs = 100;
+		auto dump_tokens_info_to_file = std::make_shared<DumpTokenHandlersInfoToFileTaskMock>(
+			async_task_processor, token_handler_factory, kDumpFileName, kPeriodicalDumpTimeoutMs);
+		async_task_processor->PostDeferred(dump_tokens_info_to_file, kPeriodicalDumpTimeoutMs);
+
 		auto token_handler_dispatcher = std::make_shared<proto::TokenHandlerDispatcher>(async_task_processor, token_handler_factory);
 
 		auto server_handler = std::make_shared<proto::Server>(token_handler_dispatcher);
 		netcoro::TcpServer server(kPort, server_handler, kThreadPoolSize, kDefaultOperationTimeoutMs);
 
-		const std::string kTokensFileName("test_tokens.bin");
-		const std::string kResultsFileName("results.bin");
 		const int kTokensNumber = 10;
 		const int kTokenMinSize = 30;
 		ASSERT_TRUE(TokenHandlerMock::GenerateTokensFile(kTokensFileName, kTokensNumber, kTokenMinSize));
@@ -40,10 +47,10 @@ TEST(ClientServerProtocol, ClientServerProtocolTest)
 		}
 
 		ASSERT_TRUE(token_handler_factory->CheckResults(kTokensNumber, kClientsNumber));
-		token_handler_factory->DumpInfoToFile(kResultsFileName);
-		std::error_code ec;
-		ASSERT_TRUE(std::filesystem::remove(kResultsFileName, ec));
-		ASSERT_TRUE(std::filesystem::remove(kTokensFileName, ec));
 	}
+
+	std::error_code ec;
+	ASSERT_TRUE(std::filesystem::remove(kDumpFileName, ec));
+	ASSERT_TRUE(std::filesystem::remove(kTokensFileName, ec));
 	ASSERT_TRUE(ClientServerBase::IsObjCountersNull());
 }

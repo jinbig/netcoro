@@ -14,9 +14,9 @@ TEST(Connection, ClientServerTest)
 		const int kClientNumber = 100;
 		ClientMock client_mock(kThreadPoolSize);
 		client_mock.StartClients(kClientNumber);
+		ASSERT_FALSE(ClientServerBase::IsObjCountersNull());
 		EXPECT_TRUE(server_mock.CheckResults(kClientNumber));
 		EXPECT_TRUE(client_mock.CheckResults(kClientNumber));
-		ASSERT_FALSE(ClientServerBase::IsObjCountersNull());
 	}
 	ASSERT_TRUE(ClientServerBase::IsObjCountersNull());
 }
